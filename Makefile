@@ -281,7 +281,7 @@ user_run:
 		-u $(shell whoami) \
 		-v $(HOST_DIR):/host \
 		-v $(shell whoami)-home:/home/$(shell whoami) \
-		-v /etc/localtime:/etc/localtime:ro \
+		-v $(realpath /etc/localtime):/etc/localtime:ro \
 		$(USER_IMG)-$(shell id -u) $(EXEC)
 
 .PHONY: user_run_l4v
@@ -294,7 +294,7 @@ user_run_l4v:
 		-v $(HOST_DIR):/host \
 		-v $(shell whoami)-home:/home/$(shell whoami) \
 		-v $(shell whoami)-isabelle:/isabelle \
-		-v /etc/localtime:/etc/localtime:ro \
+		-v $(realpath /etc/localtime):/etc/localtime:ro \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
 		-e DISPLAY=$(DISPLAY) \
 		$(USER_IMG)-$(shell id -u) $(EXEC)
@@ -312,7 +312,7 @@ endif
 
 	# Figure out if any trustworthy systems docker images are potentially too old
 	@for img in $(shell docker images --filter=reference='trustworthysystems/*:latest' -q); do \
-		if [ $$(( ( $$(date +%s) - $$(date --date=$$(docker inspect --format='{{.Created}}' $${img}) +%s) ) / (60*60*24) )) -gt 30 ]; then \
+		if [ $$(( ( $$(gdate +%s) - $$(gdate --date=$$(docker inspect --format='{{.Created}}' $${img}) +%s) ) / (60*60*24) )) -gt 30 ]; then \
 			echo "The docker image: $$(docker inspect --format='{{(index .RepoTags 0)}}' $${img}) is getting a bit old (more than 30 days). You should consider updating it."; \
 			sleep 2; \
 		fi; \
